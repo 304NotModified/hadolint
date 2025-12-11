@@ -171,13 +171,17 @@ def generate_wiki_page(rule_info, readme_data):
     severity = rule_info['severity']
     message = rule_info['message']
     
-    # Try to get the message from README if not found in source
-    if not message and readme_data and code in readme_data:
-        message = readme_data[code]
-    
-    # Clean the message
+    # Clean the message first
     if message:
         message = clean_message(message)
+    
+    # Check if message is incomplete (less than 10 chars or ends with special chars like ` or <)
+    # These indicate string concatenation that we couldn't parse
+    is_incomplete = not message or len(message) < 10 or message.endswith('`') or message.endswith('<')
+    
+    # Try to get the message from README if not found or incomplete in source
+    if (not message or is_incomplete) and readme_data and code in readme_data:
+        message = readme_data[code]
     
     if not message:
         message = f"Rule {code}"
@@ -272,8 +276,20 @@ def main():
             with open(wiki_file, 'w') as f:
                 f.write(wiki_content)
             
-            message = rule_info['message'] or readme_rules.get(code, '')
-            message = clean_message(message) if message else ''
+            # Get message with same logic as wiki page generation
+            message = rule_info['message']
+            if message:
+                message = clean_message(message)
+            
+            # Check if message is incomplete
+            is_incomplete = not message or len(message) < 10 or message.endswith('`') or message.endswith('<')
+            
+            # Use README message if incomplete
+            if (not message or is_incomplete) and code in readme_rules:
+                message = readme_rules[code]
+            
+            if not message:
+                message = f"Rule {code}"
             
             rules_generated.append({
                 'code': code,
