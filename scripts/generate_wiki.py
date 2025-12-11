@@ -165,6 +165,22 @@ def get_rule_examples(code, message, readme_desc):
     
     return examples
 
+def is_message_incomplete(message):
+    """Check if a message is incomplete or truncated.
+    
+    Returns True if the message appears incomplete, which can happen when:
+    - The message is empty or very short (less than 10 characters)
+    - The message ends with special characters like backtick or angle bracket,
+      indicating Haskell string concatenation that wasn't fully parsed
+    """
+    MIN_MESSAGE_LENGTH = 10
+    INCOMPLETE_INDICATORS = ('`', '<')
+    
+    if not message or len(message) < MIN_MESSAGE_LENGTH:
+        return True
+    
+    return any(message.endswith(indicator) for indicator in INCOMPLETE_INDICATORS)
+
 def generate_wiki_page(rule_info, readme_data):
     """Generate markdown content for a wiki page."""
     code = rule_info['code']
@@ -175,12 +191,8 @@ def generate_wiki_page(rule_info, readme_data):
     if message:
         message = clean_message(message)
     
-    # Check if message is incomplete (less than 10 chars or ends with special chars like ` or <)
-    # These indicate string concatenation that we couldn't parse
-    is_incomplete = not message or len(message) < 10 or message.endswith('`') or message.endswith('<')
-    
-    # Try to get the message from README if not found or incomplete in source
-    if (not message or is_incomplete) and readme_data and code in readme_data:
+    # Try to get the message from README if incomplete in source
+    if is_message_incomplete(message) and readme_data and code in readme_data:
         message = readme_data[code]
     
     if not message:
@@ -281,11 +293,8 @@ def main():
             if message:
                 message = clean_message(message)
             
-            # Check if message is incomplete
-            is_incomplete = not message or len(message) < 10 or message.endswith('`') or message.endswith('<')
-            
             # Use README message if incomplete
-            if (not message or is_incomplete) and code in readme_rules:
+            if is_message_incomplete(message) and code in readme_rules:
                 message = readme_rules[code]
             
             if not message:
