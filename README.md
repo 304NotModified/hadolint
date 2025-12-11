@@ -635,6 +635,26 @@ Run integration tests:
 ./integration_test.sh
 ```
 
+### Wiki Documentation
+
+The wiki pages for all rules are maintained in the `wiki/` directory.
+These pages provide detailed documentation for each linting rule and are automatically
+generated from the source code.
+
+To regenerate the wiki pages after making changes to rules:
+
+```bash
+python3 scripts/generate_wiki.py
+```
+
+To upload the generated pages to the GitHub wiki:
+
+```bash
+./scripts/upload_wiki.sh
+```
+
+See `wiki/README.md` for more details on wiki maintenance.
+
 ### AST
 
 Dockerfile syntax is fully described in the [Dockerfile reference][].
