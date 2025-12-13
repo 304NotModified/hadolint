@@ -1,4 +1,4 @@
-cabal-version:      2.0
+cabal-version:      2.4
 name:               hadolint
 version:            2.14.0
 synopsis:           Dockerfile Linter JavaScript API
@@ -10,7 +10,7 @@ homepage:           https://github.com/hadolint/hadolint
 author:             Lukas Martinelli
 maintainer:         me@lukasmartinelli.ch
 copyright:          Lukas Martinelli
-license:            GPL-3
+license:            GPL-3.0-only
 license-file:       LICENSE
 build-type:         Simple
 extra-source-files: README.md
